@@ -18,6 +18,8 @@ export interface Event {
   date_time: string
   max_seats: number
   status: EventStatus
+  children_allowed: boolean
+  pets_allowed: boolean
   created_at: string
   updated_at: string
   // Joined fields
@@ -26,11 +28,19 @@ export interface Event {
   confirmed_seats?: number
 }
 
+export interface Pets {
+  dog: number
+  cat: number
+  other: number
+}
+
 export interface Reservation {
   id: string
   event_id: string
   user_id: string
   status: ReservationStatus
+  children_count: number
+  pets: Pets | null
   created_at: string
   cancelled_at: string | null
   // Joined fields
@@ -49,8 +59,15 @@ export interface CreateEventPayload {
   description?: string
   date_time: string
   max_seats: number
+  children_allowed: boolean
+  pets_allowed: boolean
 }
 
 export interface UpdateEventPayload extends Partial<CreateEventPayload> {
   id: string
+}
+
+export interface ReservationExtras {
+  children_count: number
+  pets: Pets | null
 }

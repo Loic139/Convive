@@ -64,9 +64,22 @@
           <SeatIndicator :confirmed-seats="confirmedSeats" :max-seats="event.max_seats" />
         </div>
 
+        <!-- Enfants & Animaux bienvenus -->
+        <div v-if="event.children_allowed || event.pets_allowed" class="border-t border-beige-dark pt-5 mb-6">
+          <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-3">Bienvenus</p>
+          <div class="flex flex-wrap gap-2">
+            <span v-if="event.children_allowed" class="badge bg-blue-50 text-blue-700 border border-blue-100">
+              🧒 Enfants bienvenus
+            </span>
+            <span v-if="event.pets_allowed" class="badge bg-amber-50 text-amber-700 border border-amber-100">
+              🐾 Animaux bienvenus
+            </span>
+          </div>
+        </div>
+
         <!-- Description -->
-        <div v-if="event.description" class="border-t border-beige-dark pt-5">
-          <p class="text-sm text-gray-600 whitespace-pre-wrap">{{ event.description }}</p>
+        <div v-if="event.description" :class="['pt-5 text-sm text-gray-600 whitespace-pre-wrap', (event.children_allowed || event.pets_allowed) ? '' : 'border-t border-beige-dark']">
+          {{ event.description }}
         </div>
       </div>
 
@@ -102,15 +115,22 @@
       <div v-else>
         <template v-if="user">
           <UiButton
+            v-if="event.status !== 'active'"
             size="lg"
             full
-            :disabled="event.status !== 'active'"
-            :loading="reserving"
-            @click="reserve"
+            disabled
           >
             <template v-if="event.status === 'full'">🔴 {{ $t('reservation.cta_full') }}</template>
             <template v-else-if="event.status === 'cancelled'">{{ $t('reservation.cta_cancelled') }}</template>
-            <template v-else>🍽 {{ $t('reservation.cta') }}</template>
+            <template v-else>{{ $t('reservation.cta_past') }}</template>
+          </UiButton>
+          <UiButton
+            v-else
+            size="lg"
+            full
+            @click="showReserveModal = true"
+          >
+            🍽 {{ $t('reservation.cta') }}
           </UiButton>
         </template>
         <template v-else>
@@ -129,6 +149,30 @@
         </template>
       </div>
     </template>
+
+    <!-- Reserve modal (avec extras si besoin) -->
+    <UiModal
+      v-model="showReserveModal"
+      title="Réserver ma place"
+      :description="event ? event.title : ''"
+    >
+      <div class="mt-4 space-y-5">
+        <EventsReservationExtrasForm
+          v-if="event && (event.children_allowed || event.pets_allowed)"
+          :children-allowed="event.children_allowed"
+          :pets-allowed="event.pets_allowed"
+          @update="onExtrasUpdate"
+        />
+        <div class="flex gap-3">
+          <UiButton :loading="reserving" @click="reserve">
+            🍽 Confirmer ma réservation
+          </UiButton>
+          <UiButton variant="ghost" @click="showReserveModal = false">
+            {{ $t('common.cancel') }}
+          </UiButton>
+        </div>
+      </div>
+    </UiModal>
 
     <!-- Cancel reservation modal -->
     <UiModal
@@ -165,6 +209,15 @@ const loading = ref(true)
 const reserving = ref(false)
 const cancelling = ref(false)
 const showCancelModal = ref(false)
+const showReserveModal = ref(false)
+const reservationExtras = ref<{ children_count: number; pets: { dog: number; cat: number; other: number } | null }>({
+  children_count: 0,
+  pets: null,
+})
+
+function onExtrasUpdate(extras: typeof reservationExtras.value) {
+  reservationExtras.value = extras
+}
 const event = ref<Event & { organizer?: { full_name: string | null } } | null>(null)
 const myReservation = ref<Reservation | null>(null)
 const confirmedSeats = ref(0)
@@ -216,10 +269,15 @@ async function reserve() {
   if (!user.value || !event.value) return
   reserving.value = true
 
+  showReserveModal.value = false
   try {
     await $fetch('/api/reservations', {
       method: 'POST',
-      body: { event_id: event.value.id },
+      body: {
+        event_id: event.value.id,
+        children_count: reservationExtras.value.children_count,
+        pets: reservationExtras.value.pets,
+      },
     })
 
     toast.success(

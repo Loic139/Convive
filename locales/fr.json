@@ -77,6 +77,11 @@
       "cancelled": "Annulé",
       "archived": "Passé"
     },
+    "welcome_options": "Options de bienvenue",
+    "children_allowed": "Enfants bienvenus",
+    "children_allowed_hint": "Les invités pourront indiquer le nombre d'enfants",
+    "pets_allowed": "Animaux bienvenus",
+    "pets_allowed_hint": "Les invités pourront indiquer chien, chat ou autre",
     "errors": {
       "title_required": "Le titre est requis",
       "date_required": "La date est requise",
@@ -102,6 +107,11 @@
     "cancel_cta": "Oui, annuler",
     "keep_cta": "Non, garder ma place",
     "login_to_reserve": "Connecte-toi pour réserver",
+    "children_count": "Combien d'enfants amènes-tu ?",
+    "pets": "Amènes-tu des animaux ?",
+    "pet_dog": "Chien",
+    "pet_cat": "Chat",
+    "pet_other": "Autre animal",
     "errors": {
       "already_reserved": "Tu as déjà réservé ce repas",
       "event_full": "Le repas est complet",

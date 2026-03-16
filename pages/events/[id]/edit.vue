@@ -63,6 +63,8 @@ const initialForm = computed(() => {
     date: d.toISOString().split('T')[0],
     time: d.toTimeString().slice(0, 5),
     max_seats: event.value.max_seats,
+    children_allowed: event.value.children_allowed,
+    pets_allowed: event.value.pets_allowed,
   }
 })
 

@@ -50,6 +50,49 @@
       required
     />
 
+    <!-- Enfants & Animaux -->
+    <div class="space-y-3">
+      <p class="label">{{ $t('event.welcome_options') }}</p>
+
+      <!-- Enfants -->
+      <label class="flex items-center justify-between p-4 bg-beige rounded-xl border border-beige-dark cursor-pointer hover:border-terracotta/40 transition-colors">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🧒</span>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">{{ $t('event.children_allowed') }}</p>
+            <p class="text-xs text-gray-500">{{ $t('event.children_allowed_hint') }}</p>
+          </div>
+        </div>
+        <div
+          :class="['relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0', form.children_allowed ? 'bg-terracotta' : 'bg-gray-200']"
+          @click="form.children_allowed = !form.children_allowed"
+        >
+          <span
+            :class="['absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200', form.children_allowed ? 'translate-x-5' : 'translate-x-0']"
+          />
+        </div>
+      </label>
+
+      <!-- Animaux -->
+      <label class="flex items-center justify-between p-4 bg-beige rounded-xl border border-beige-dark cursor-pointer hover:border-terracotta/40 transition-colors">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🐾</span>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">{{ $t('event.pets_allowed') }}</p>
+            <p class="text-xs text-gray-500">{{ $t('event.pets_allowed_hint') }}</p>
+          </div>
+        </div>
+        <div
+          :class="['relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0', form.pets_allowed ? 'bg-terracotta' : 'bg-gray-200']"
+          @click="form.pets_allowed = !form.pets_allowed"
+        >
+          <span
+            :class="['absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200', form.pets_allowed ? 'translate-x-5' : 'translate-x-0']"
+          />
+        </div>
+      </label>
+    </div>
+
     <!-- Aperçu du slug -->
     <div v-if="slugPreview" class="bg-beige rounded-xl p-4 border border-beige-dark">
       <p class="text-xs text-gray-500 mb-1">{{ $t('event.slug_preview') }}</p>
@@ -81,6 +124,8 @@ interface Props {
     date?: string
     time?: string
     max_seats?: number
+    children_allowed?: boolean
+    pets_allowed?: boolean
   }
   loading?: boolean
   isEdit?: boolean
@@ -108,6 +153,8 @@ const form = reactive({
   date: props.initial?.date ?? '',
   time: props.initial?.time ?? '19:30',
   max_seats: String(props.initial?.max_seats ?? ''),
+  children_allowed: props.initial?.children_allowed ?? false,
+  pets_allowed: props.initial?.pets_allowed ?? false,
 })
 
 const errors = reactive({
@@ -178,6 +225,8 @@ function handleSubmit() {
     description: form.description.trim() || undefined,
     date_time,
     max_seats: parseInt(form.max_seats),
+    children_allowed: form.children_allowed,
+    pets_allowed: form.pets_allowed,
   })
 }
 

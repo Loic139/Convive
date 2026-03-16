@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const { event_id } = body
+  const { event_id, children_count = 0, pets = null } = body
 
   if (!event_id) {
     throw createError({ statusCode: 400, statusMessage: 'event_id requis' })
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
   } else {
     const { data, error } = await serviceClient
       .from('reservations')
-      .insert({ event_id, user_id: user.id })
+      .insert({ event_id, user_id: user.id, children_count, pets })
       .select()
       .single()
     if (error) {

@@ -82,9 +82,9 @@
               <li
                 v-for="res in reservations"
                 :key="res.id"
-                class="flex items-center gap-3"
+                class="flex items-start gap-3"
               >
-                <div class="w-9 h-9 avatar text-sm flex-shrink-0">
+                <div class="w-9 h-9 avatar text-sm flex-shrink-0 mt-0.5">
                   {{ getInitials(res.user?.full_name || res.user?.email || '?') }}
                 </div>
                 <div class="flex-1 min-w-0">
@@ -92,8 +92,23 @@
                     {{ res.user?.full_name || 'Utilisateur' }}
                   </p>
                   <p class="text-xs text-gray-400 truncate">{{ res.user?.email }}</p>
+                  <!-- Extras -->
+                  <div class="flex flex-wrap gap-1.5 mt-1.5">
+                    <span v-if="res.children_count > 0" class="badge bg-blue-50 text-blue-600 border border-blue-100 text-xs">
+                      🧒 {{ res.children_count }} {{ res.children_count <= 1 ? 'enfant' : 'enfants' }}
+                    </span>
+                    <span v-if="res.pets?.dog" class="badge bg-amber-50 text-amber-700 border border-amber-100 text-xs">
+                      🐕 {{ res.pets.dog }}
+                    </span>
+                    <span v-if="res.pets?.cat" class="badge bg-amber-50 text-amber-700 border border-amber-100 text-xs">
+                      🐈 {{ res.pets.cat }}
+                    </span>
+                    <span v-if="res.pets?.other" class="badge bg-amber-50 text-amber-700 border border-amber-100 text-xs">
+                      🐾 {{ res.pets.other }}
+                    </span>
+                  </div>
                 </div>
-                <span class="text-xs text-gray-400">
+                <span class="text-xs text-gray-400 flex-shrink-0">
                   {{ formatDateShort(res.created_at) }}
                 </span>
               </li>
