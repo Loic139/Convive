@@ -53,6 +53,9 @@
         </UiButton>
       </form>
 
+      <!-- Social login -->
+      <AuthSocialAuth :redirect-to="redirectTo" />
+
       <p class="text-center text-sm text-gray-500 mt-6">
         {{ $t('auth.already_account') }}
         <NuxtLink :to="loginLink" class="text-terracotta font-medium hover:underline">
