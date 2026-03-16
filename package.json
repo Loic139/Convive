@@ -11,6 +11,9 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck"
   },
+  "overrides": {
+    "unhead": "^1.11.0"
+  },
   "dependencies": {
     "@nuxtjs/i18n": "^8.5.5",
     "@nuxtjs/supabase": "^1.4.0",
