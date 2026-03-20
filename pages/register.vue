@@ -129,11 +129,13 @@ async function handleSubmit() {
   loading.value = true
 
   try {
+    const config = useRuntimeConfig()
     const { error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
         data: { full_name: form.full_name.trim() },
+        emailRedirectTo: `${config.public.appUrl}/confirm?next=${encodeURIComponent(redirectTo.value)}`,
       },
     })
     if (error) throw error
