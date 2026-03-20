@@ -229,7 +229,7 @@ const formattedTime = computed(() => event.value ? formatTime(event.value.date_t
 async function loadEvent() {
   const { data: eventData } = await supabase
     .from('events')
-    .select('*, organizer:profiles(full_name)')
+    .select('*')
     .eq('slug', slug)
     .single()
 
@@ -238,7 +238,13 @@ async function loadEvent() {
     return
   }
 
-  event.value = eventData
+  const { data: organizerData } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', eventData.organizer_id)
+    .single()
+
+  event.value = { ...eventData, organizer: organizerData ?? undefined }
 
   // Count confirmed seats
   const { count } = await supabase
