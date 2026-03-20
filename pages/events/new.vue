@@ -63,6 +63,8 @@ async function createEvent(payload: CreateEventPayload) {
         description: payload.description,
         date_time: payload.date_time,
         max_seats: payload.max_seats,
+        children_allowed: payload.children_allowed,
+        pets_allowed: payload.pets_allowed,
         slug,
       })
       .select()
