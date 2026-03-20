@@ -67,10 +67,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: 'Tu as déjà réservé ce repas' })
   }
 
-  // Create or reactivate reservation
+  // Create or reactivate reservation (use user's client so RLS auth.uid() check passes)
   let reservation
   if (existing) {
-    const { data, error } = await serviceClient
+    const { data, error } = await supabase
       .from('reservations')
       .update({ status: 'confirmed', cancelled_at: null })
       .eq('id', existing.id)
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
     if (error) throw createError({ statusCode: 500, statusMessage: error.message })
     reservation = data
   } else {
-    const { data, error } = await serviceClient
+    const { data, error } = await supabase
       .from('reservations')
       .insert({ event_id, user_id: user.id, children_count, pets })
       .select()

@@ -1,4 +1,4 @@
-import { serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import {
   createServiceRoleClient,
   sendEmail,
@@ -17,10 +17,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'ID requis' })
   }
 
+  const supabase = await serverSupabaseClient(event)
   const serviceClient = createServiceRoleClient()
 
-  // Verify reservation belongs to user
-  const { data: reservation, error } = await serviceClient
+  // Verify reservation belongs to user (user client passes RLS auth.uid() check)
+  const { data: reservation, error } = await supabase
     .from('reservations')
     .select('*, event:events(title, date_time, organizer_id)')
     .eq('id', reservationId)
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Cancel reservation
-  const { error: updateError } = await serviceClient
+  const { error: updateError } = await supabase
     .from('reservations')
     .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
     .eq('id', reservationId)
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Get profile for email
-  const { data: profile } = await serviceClient
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)
