@@ -7,6 +7,10 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
   ],
 
+  components: [
+    { path: '~/components', pathPrefix: false },
+  ],
+
   css: ['~/assets/css/main.css'],
 
   app: {

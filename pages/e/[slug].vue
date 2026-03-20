@@ -157,7 +157,7 @@
       :description="event ? event.title : ''"
     >
       <div class="mt-4 space-y-5">
-        <EventsReservationExtrasForm
+        <ReservationExtrasForm
           v-if="event && (event.children_allowed || event.pets_allowed)"
           :children-allowed="event.children_allowed"
           :pets-allowed="event.pets_allowed"
