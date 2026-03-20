@@ -27,13 +27,21 @@ export default defineEventHandler(async (event) => {
   // Get event
   const { data: eventData, error: eventError } = await serviceClient
     .from('events')
-    .select('*, organizer:profiles(full_name, id)')
+    .select('*')
     .eq('id', event_id)
     .single()
 
   if (eventError || !eventData) {
     throw createError({ statusCode: 404, statusMessage: 'Événement introuvable' })
   }
+
+  // Get organizer profile separately (no direct FK events→profiles)
+  const { data: organizerProfile } = await serviceClient
+    .from('profiles')
+    .select('full_name, id')
+    .eq('id', eventData.organizer_id)
+    .single()
+  const organizer = organizerProfile ?? null
 
   if (eventData.status !== 'active') {
     const msgs: Record<string, string> = {
@@ -102,7 +110,7 @@ export default defineEventHandler(async (event) => {
     eventTitle: eventData.title,
     eventDate: formatEmailDate(eventData.date_time),
     eventTime: formatEmailTime(eventData.date_time),
-    organizerName: (eventData.organizer as { full_name: string | null })?.full_name ?? 'L\'organisateur',
+    organizerName: organizer?.full_name ?? 'L\'organisateur',
     eventUrl: `${appUrl}/e/${eventData.slug}`,
   })
   await sendEmail({ ...confirmEmail, to: user.email! })
@@ -121,7 +129,7 @@ export default defineEventHandler(async (event) => {
     )
     if (organizerData?.user?.email) {
       const fullEmail = eventFullEmail({
-        organizerName: (eventData.organizer as { full_name: string | null })?.full_name ?? 'Organisateur',
+        organizerName: organizer?.full_name ?? 'Organisateur',
         eventTitle: eventData.title,
         eventUrl: `${appUrl}/events/${eventData.id}`,
         guestCount: count,

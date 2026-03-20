@@ -250,12 +250,22 @@ async function loadEvent() {
 
   const { data: resData } = await supabase
     .from('reservations')
-    .select('*, user:profiles(*)')
+    .select('*')
     .eq('event_id', eventId)
     .eq('status', 'confirmed')
     .order('created_at', { ascending: true })
 
-  reservations.value = (resData ?? []) as (Reservation & { user: Profile })[]
+  if (resData && resData.length > 0) {
+    const userIds = resData.map((r) => r.user_id)
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', userIds)
+    const profileMap = Object.fromEntries((profiles ?? []).map((p: Profile) => [p.id, p]))
+    reservations.value = resData.map((r) => ({ ...r, user: profileMap[r.user_id] ?? null })) as (Reservation & { user: Profile })[]
+  } else {
+    reservations.value = []
+  }
   loading.value = false
 }
 

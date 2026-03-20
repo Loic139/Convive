@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   // Verify event belongs to organizer
   const { data: eventData, error } = await serviceClient
     .from('events')
-    .select('*, organizer:profiles(full_name)')
+    .select('*')
     .eq('id', eventId)
     .eq('organizer_id', user.id)
     .single()
@@ -28,6 +28,13 @@ export default defineEventHandler(async (event) => {
   if (error || !eventData) {
     throw createError({ statusCode: 404, statusMessage: 'Événement introuvable' })
   }
+
+  const { data: organizerProfile } = await serviceClient
+    .from('profiles')
+    .select('full_name')
+    .eq('id', eventData.organizer_id)
+    .single()
+  const organizer = organizerProfile ?? null
 
   if (eventData.status === 'cancelled') {
     throw createError({ statusCode: 409, statusMessage: 'Déjà annulé' })
@@ -65,7 +72,7 @@ export default defineEventHandler(async (event) => {
           guestName: profile?.full_name || userData.user.email,
           eventTitle: eventData.title,
           eventDate: formatEmailDate(eventData.date_time),
-          organizerName: (eventData.organizer as { full_name: string | null })?.full_name ?? 'L\'organisateur',
+          organizerName: organizer?.full_name ?? 'L\'organisateur',
           reason: reason || undefined,
         })
         await sendEmail({ ...cancelEmail, to: userData.user.email })
