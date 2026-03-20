@@ -1,5 +1,6 @@
 export type EventStatus = 'active' | 'full' | 'cancelled' | 'archived'
 export type ReservationStatus = 'confirmed' | 'cancelled'
+export type GroupType = 'solo' | 'couple' | 'family'
 
 export interface Profile {
   id: string
@@ -39,6 +40,7 @@ export interface Reservation {
   event_id: string
   user_id: string
   status: ReservationStatus
+  group_type: GroupType
   children_count: number
   pets: Pets | null
   created_at: string
@@ -68,6 +70,7 @@ export interface UpdateEventPayload extends Partial<CreateEventPayload> {
 }
 
 export interface ReservationExtras {
+  group_type: GroupType
   children_count: number
   pets: Pets | null
 }

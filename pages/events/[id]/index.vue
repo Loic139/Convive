@@ -94,6 +94,12 @@
                   <p class="text-xs text-gray-400 truncate">{{ res.user?.email }}</p>
                   <!-- Extras -->
                   <div class="flex flex-wrap gap-1.5 mt-1.5">
+                    <span
+                      class="badge bg-gray-50 text-gray-600 border border-gray-200 text-xs"
+                    >
+                      {{ res.group_type === 'couple' ? '👫' : res.group_type === 'family' ? '👨‍👩‍👧' : '🧍' }}
+                      {{ $t(`reservation.group_${res.group_type}`) }}
+                    </span>
                     <span v-if="res.children_count > 0" class="badge bg-blue-50 text-blue-600 border border-blue-100 text-xs">
                       🧒 {{ res.children_count }} {{ res.children_count <= 1 ? 'enfant' : 'enfants' }}
                     </span>

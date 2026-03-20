@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const { event_id, children_count = 0, pets = null } = body
+  const { event_id, group_type = 'solo', children_count = 0, pets = null } = body
 
   if (!event_id) {
     throw createError({ statusCode: 400, statusMessage: 'event_id requis' })
@@ -81,7 +81,7 @@ export default defineEventHandler(async (event) => {
   } else {
     const { data, error } = await supabase
       .from('reservations')
-      .insert({ event_id, user_id: user.id, children_count, pets })
+      .insert({ event_id, user_id: user.id, group_type, children_count, pets })
       .select()
       .single()
     if (error) {

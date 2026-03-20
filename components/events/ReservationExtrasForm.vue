@@ -1,5 +1,27 @@
 <template>
   <div class="space-y-5">
+    <!-- Type de groupe -->
+    <div>
+      <label class="label">👥 {{ $t('reservation.group_type') }}</label>
+      <div class="grid grid-cols-3 gap-2 mt-2">
+        <button
+          v-for="option in groupOptions"
+          :key="option.value"
+          type="button"
+          :class="[
+            'flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-colors text-sm font-medium',
+            localGroupType === option.value
+              ? 'border-terracotta bg-terracotta-50 text-terracotta'
+              : 'border-gray-200 bg-white text-gray-600 hover:bg-beige',
+          ]"
+          @click="localGroupType = option.value"
+        >
+          <span class="text-xl">{{ option.emoji }}</span>
+          <span>{{ option.label }}</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Enfants -->
     <div v-if="childrenAllowed">
       <label class="label">🧒 {{ $t('reservation.children_count') }}</label>
@@ -118,8 +140,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
-import type { Pets } from '~/types'
+import { reactive, ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Pets, GroupType } from '~/types'
 
 const props = defineProps<{
   childrenAllowed: boolean
@@ -127,17 +150,27 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  update: [extras: { children_count: number; pets: Pets | null }]
+  update: [extras: { group_type: GroupType; children_count: number; pets: Pets | null }]
 }>()
 
+const { t } = useI18n()
+
+const groupOptions = computed(() => [
+  { value: 'solo' as GroupType, emoji: '🧍', label: t('reservation.group_solo') },
+  { value: 'couple' as GroupType, emoji: '👫', label: t('reservation.group_couple') },
+  { value: 'family' as GroupType, emoji: '👨‍👩‍👧', label: t('reservation.group_family') },
+])
+
+const localGroupType = ref<GroupType>('solo')
 const localChildren = ref(0)
 const localPets = reactive<Pets>({ dog: 0, cat: 0, other: 0 })
 
 watch(
-  [localChildren, localPets],
+  [localGroupType, localChildren, localPets],
   () => {
     const totalPets = localPets.dog + localPets.cat + localPets.other
     emit('update', {
+      group_type: localGroupType.value,
       children_count: localChildren.value,
       pets: props.petsAllowed && totalPets > 0 ? { ...localPets } : null,
     })

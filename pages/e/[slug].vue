@@ -158,7 +158,7 @@
     >
       <div class="mt-4 space-y-5">
         <ReservationExtrasForm
-          v-if="event && (event.children_allowed || event.pets_allowed)"
+          v-if="event"
           :children-allowed="event.children_allowed"
           :pets-allowed="event.pets_allowed"
           @update="onExtrasUpdate"
@@ -210,7 +210,8 @@ const reserving = ref(false)
 const cancelling = ref(false)
 const showCancelModal = ref(false)
 const showReserveModal = ref(false)
-const reservationExtras = ref<{ children_count: number; pets: { dog: number; cat: number; other: number } | null }>({
+const reservationExtras = ref<{ group_type: 'solo' | 'couple' | 'family'; children_count: number; pets: { dog: number; cat: number; other: number } | null }>({
+  group_type: 'solo',
   children_count: 0,
   pets: null,
 })
@@ -281,6 +282,7 @@ async function reserve() {
       method: 'POST',
       body: {
         event_id: event.value.id,
+        group_type: reservationExtras.value.group_type,
         children_count: reservationExtras.value.children_count,
         pets: reservationExtras.value.pets,
       },
